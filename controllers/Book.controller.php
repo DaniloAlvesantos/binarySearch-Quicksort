@@ -12,6 +12,14 @@ class BookController
         $this->repository = new BookRepository();
     }
 
+    public function cards() {
+        $books = $this->repository->getAllBooks();
+
+        $_REQUEST['books'] = $books;
+
+        require_once __DIR__ . "/../views/book/card.php";
+    }
+
     public function getAll() {
         return $this->repository->getAllBooks();
     }

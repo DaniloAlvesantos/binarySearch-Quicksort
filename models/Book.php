@@ -50,6 +50,10 @@ class Book
         return $this->price;
     }
 
+    public function getFormatedPrice(): string {
+        return number_format($this->price, 2, ',', '.');
+    }
+
     public function getPubYear(): int
     {
         return $this->pub_year;

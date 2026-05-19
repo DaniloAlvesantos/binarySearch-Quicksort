@@ -33,7 +33,6 @@ class BookRepository
 
         foreach ($result as $row) {
             $books[] = new Book(
-                $row["id"],
                 $row["name"],
                 $row["description"],
                 $row["slug"],
