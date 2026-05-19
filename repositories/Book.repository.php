@@ -1,0 +1,201 @@
+<?php
+
+require_once __DIR__ . "/../config/Database.php";
+require_once __DIR__ . "/../models/Book.php";
+
+class BookRepository
+{
+    private PDO $conn;
+
+    public function __construct()
+    {
+        $db = Database::getInstance();
+        $this->conn = $db->getConnection();
+    }
+
+    public function getAllBooks(): array
+    {
+        $stmt = $this->conn->query(
+            "SELECT 
+                id,
+                name,
+                description,
+                slug,
+                number_of_pages,
+                price,
+                publication_year
+             FROM tb_books"
+        );
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $books = [];
+
+        foreach ($result as $row) {
+            $books[] = new Book(
+                $row["id"],
+                $row["name"],
+                $row["description"],
+                $row["slug"],
+                $row["number_of_pages"],
+                $row["price"],
+                $row["publication_year"]
+            );
+        }
+
+        return $books;
+    }
+
+    public function getBookBySlug(string $slug): ?Book
+    {
+        if (empty($slug)) {
+            return null;
+        }
+
+        $stmt = $this->conn->prepare(
+            "SELECT 
+                id,
+                name,
+                description,
+                slug,
+                number_of_pages,
+                price,
+                publication_year
+             FROM tb_books
+             WHERE slug = ?"
+        );
+
+        $stmt->execute([$slug]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return null;
+        }
+
+        return new Book(
+            $result["id"],
+            $result["name"],
+            $result["description"],
+            $result["slug"],
+            $result["number_of_pages"],
+            $result["price"],
+            $result["publication_year"]
+        );
+    }
+
+    public function createBook(Book $b, array $authors, array $genres): bool
+    {
+        try {
+            $this->conn->beginTransaction();
+
+            // Insert book
+            $stmt = $this->conn->prepare(
+                "INSERT INTO tb_books (
+                    name,
+                    description,
+                    slug,
+                    number_of_pages,
+                    price,
+                    publication_year
+                )
+                VALUES (?, ?, ?, ?, ?, ?)"
+            );
+
+            $stmt->execute([
+                $b->getName(),
+                $b->getDescription(),
+                $b->getSlug(),
+                $b->getNumberOfPages(),
+                $b->getPrice(),
+                $b->getPubYear()
+            ]);
+
+            $bookId = (int) $this->conn->lastInsertId();
+
+            // Insert authors
+            if (!empty($authors)) {
+                $stmtAuthors = $this->conn->prepare(
+                    "INSERT INTO tb_books_authors (
+                        book_id,
+                        author_id
+                    )
+                    VALUES (?, ?)"
+                );
+
+                foreach ($authors as $authorId) {
+                    $stmtAuthors->execute([
+                        $bookId,
+                        $authorId
+                    ]);
+                }
+            }
+
+            // Insert genres
+            if (!empty($genres)) {
+                $stmtGenres = $this->conn->prepare(
+                    "INSERT INTO tb_books_genres (
+                        book_id,
+                        genre_id
+                    )
+                    VALUES (?, ?)"
+                );
+
+                foreach ($genres as $genreId) {
+                    $stmtGenres->execute([
+                        $bookId,
+                        $genreId
+                    ]);
+                }
+            }
+
+            $this->conn->commit();
+
+            return true;
+        } catch (PDOException $e) {
+
+            if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+            }
+
+            throw new Exception(
+                "Error on creating book: " . $e->getMessage()
+            );
+        }
+    }
+
+    public function deleteBook(int $id): bool
+    {
+        $stmt = $this->conn->prepare(
+            "DELETE FROM tb_books
+             WHERE id = ?"
+        );
+
+        return $stmt->execute([$id]);
+    }
+
+    public function updateBook(Book $b): bool
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE tb_books
+             SET
+                name = ?,
+                description = ?,
+                slug = ?,
+                number_of_pages = ?,
+                price = ?,
+                publication_year = ?
+             WHERE id = ?"
+        );
+
+        return $stmt->execute([
+            $b->getName(),
+            $b->getDescription(),
+            $b->getSlug(),
+            $b->getNumberOfPages(),
+            $b->getPrice(),
+            $b->getPubYear(),
+            $b->getId()
+        ]);
+    }
+}
