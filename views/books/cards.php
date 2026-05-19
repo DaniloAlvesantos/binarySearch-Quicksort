@@ -5,8 +5,8 @@ $books = $_REQUEST['books'];
 ?>
 
 <?php foreach ($books as $book): ?>
-    <div>
-        <a href="/pages/book?<?= $book->getSlug(); ?>">
+    <div class="card w-25 p-2 m-4">
+        <a class="card-title" href="/pages/book?<?= $book->getSlug(); ?>">
             <?= $book->getName(); ?>
         </a>
         <ul>

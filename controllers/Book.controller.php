@@ -17,7 +17,10 @@ class BookController
 
         $_REQUEST['books'] = $books;
 
-        require_once __DIR__ . "/../views/book/card.php";
+        ob_start();
+        require_once __DIR__ . "/../views/books/cards.php";
+        $content = ob_get_clean();
+        require_once __DIR__ . "/../views/layout.php";
     }
 
     public function getAll() {
