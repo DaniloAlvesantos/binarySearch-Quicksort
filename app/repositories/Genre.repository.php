@@ -1,7 +1,11 @@
 <?php
 
-require_once __DIR__ . "/../config/Database.php";
-require_once __DIR__ . "/../models/Book.php";
+namespace App\Repositories;
+
+use App\Models\Genre;
+use Config\Database;
+use PDO;
+use PDOException;
 
 class GenreRepository
 {

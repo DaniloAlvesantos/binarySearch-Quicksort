@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+use Config\Database;
+
 class UserRepositoy
 {
     private PDO $conn;

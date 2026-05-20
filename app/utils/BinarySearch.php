@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Utils;
+
 class BinarySearch
 {
     public static function byString(array $arr, string $target)

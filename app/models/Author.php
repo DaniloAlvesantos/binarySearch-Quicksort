@@ -1,15 +1,15 @@
 <?php
 
-class Genre
+namespace App\Models;
+
+class Author
 {
     private ?int $id;
     private string $name;
-    private int $parentId;
 
-    public function __construct(string $name, int $parentId)
+    public function __construct(string $name)
     {
         $this->setName($name);
-        $this->setParentId($parentId);
     }
 
     public function getId(): int
@@ -22,14 +22,9 @@ class Genre
         return $this->name;
     }
 
-    public function getParentId(): int
-    {
-        return $this->parentId;
-    }
-
     public function setId(int $id): void
     {
-        if($this->id === null){
+        if ($this->id === null) {
             $this->id = $id;
         }
     }
@@ -39,12 +34,5 @@ class Genre
         if (empty($name)) return;
 
         $this->name = $name;
-    }
-
-    public function setParentId(int $parentId): void
-    {
-        if ($parentId <= 0) return;
-
-        $this->parentId = $parentId;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Utils;
+
 class Quicksort
 {
     public static function intSort(array &$arr, int $left, int $right)

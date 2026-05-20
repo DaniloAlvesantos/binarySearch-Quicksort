@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Models;
+
 class Book
 {
     private ?int $id;
@@ -51,7 +53,7 @@ class Book
     }
 
     public function getFormatedPrice(): string {
-        return number_format($this->price, 2, ',', '.');
+        return 'R$' . number_format($this->price, 2, ',', '.');
     }
 
     public function getPubYear(): int
@@ -61,7 +63,7 @@ class Book
 
     public function setId(int $id): void
     {
-        if ($this->id === null) {
+        if (!isset($this->id)) {
             $this->id = $id;
         }
     }

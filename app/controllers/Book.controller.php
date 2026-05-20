@@ -1,7 +1,9 @@
 <?php
 
-require_once __DIR__ . "/../models/Book.php";
-require_once __DIR__ . "/../repositories/Book.repository.php";
+namespace App\Controllers;
+
+use App\Models\Book;
+use App\Repositories\BookRepository;
 
 class BookController
 {
@@ -10,6 +12,21 @@ class BookController
     public function __construct()
     {
         $this->repository = new BookRepository();
+    }
+
+    public function book() {
+        $book = $this->repository->getBookBySlug($_GET['b']);
+        
+        if(!isset($book)) {
+            return;
+        }
+
+        $_REQUEST['book'] = $book;
+
+        ob_start();
+        require_once __DIR__ . "/../views/books/book.php";
+        $content = ob_get_clean();
+        require_once __DIR__ . "/../views/layout.php";
     }
 
     public function cards() {

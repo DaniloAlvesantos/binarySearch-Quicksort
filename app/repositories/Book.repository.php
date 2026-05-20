@@ -1,7 +1,11 @@
 <?php
 
-require_once __DIR__ . "/../config/Database.php";
-require_once __DIR__ . "/../models/Book.php";
+namespace App\Repositories;
+
+use App\Models\Book;
+use Config\Database;
+use PDO;
+use PDOException;
 
 class BookRepository
 {
@@ -13,33 +17,41 @@ class BookRepository
         $this->conn = $db->getConnection();
     }
 
-    public function getAllBooks(): array
+    public function getAllBooks(int $limit = 5): array
     {
-        $stmt = $this->conn->query(
+        $stmt = $this->conn->prepare(
             "SELECT 
-                id,
-                name,
-                description,
-                slug,
-                number_of_pages,
-                price,
-                publication_year
-             FROM tb_books"
+            id,
+            name,
+            slug,
+            number_of_pages,
+            price,
+            publication_year
+         FROM tb_books
+         LIMIT :limit"
         );
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        $stmt->execute();
 
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $books = [];
 
         foreach ($result as $row) {
-            $books[] = new Book(
+            $book = new Book(
                 $row["name"],
-                $row["description"],
+                "",
                 $row["slug"],
                 $row["number_of_pages"],
                 $row["price"],
                 $row["publication_year"]
             );
+
+            $book->setId($row["id"]);
+
+            $books[] = $book;
         }
 
         return $books;
@@ -73,7 +85,6 @@ class BookRepository
         }
 
         return new Book(
-            $result["id"],
             $result["name"],
             $result["description"],
             $result["slug"],
@@ -157,7 +168,7 @@ class BookRepository
                 $this->conn->rollBack();
             }
 
-            throw new Exception(
+            die(
                 "Error on creating book: " . $e->getMessage()
             );
         }

@@ -1,7 +1,11 @@
 <?php
 
-require_once __DIR__ . "/../config/Database.php";
-require_once __DIR__ . "/../models/Book.php";
+namespace App\Repositories;
+
+use App\Models\Author;
+use Config\Database;
+use PDO;
+use PDOException;
 
 class AuthorRepository
 {
@@ -29,7 +33,6 @@ class AuthorRepository
 
             foreach ($result as $row) {
                 $authors[] = new Author(
-                    $row["id"],
                     $row["name"]
                 );
             }
