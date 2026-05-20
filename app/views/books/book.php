@@ -3,11 +3,14 @@
 use App\Models\Book;
 
 /** @var Book $book */
-    $book = $_REQUEST['book'];
+$book = $_REQUEST['book'];
 
-    if(!isset($book)) {
-        return;
-    }
+if (!isset($book)) {
+    $title = "Livro não encontrado";
+    $content = "<h1>O livro solicitado não foi encontrado em nosso acervo.</h1>";
+    require_once __DIR__ . "/../views/layout.php";
+    return;
+}
 ?>
 
 <section class="container-fluid">

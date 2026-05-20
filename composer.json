@@ -4,7 +4,8 @@
   "license": "proprietary",
   "autoload": {
     "classmap": [
-      "app/"
+      "app/",
+      "config/"
     ]
   },
   "autoload-dev": {

@@ -14,32 +14,32 @@ $signedIn = (isset($_SESSION['user']) && $_SESSION['user']) ? true : false;
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">BinaryLibrary</a>
+            <a class="navbar-brand" href="<?= BASE_URL ?>">BinaryLibrary</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        <a class="nav-link active" aria-current="page" href="<?= BASE_URL ?>">Home</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="<?= BASE_URL ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Livros
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Ver todos</a></li>
-                            <li><a class="dropdown-item" href="#">Autores</a></li>
-                            <li><a class="dropdown-item" href="#">Gêneros</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/index.php?action=books">Ver todos</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/authors">Autores</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/genres">Gêneros</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#"><?= $signedIn ? "Perfil" : "Login"; ?></a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search" value="<?= $_GET['search'] ?? "" ?>" />
-                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                <form class="d-flex" role="search" action="/" method="GET">
+                    <input class="form-control me-2" type="search" name="search" placeholder="Pesquisar" aria-label="Search" value="<?= htmlspecialchars($_GET['search'] ?? "") ?>" />
+                    <button class="btn btn-outline-primary" type="submit">Buscar</button>
                 </form>
             </div>
         </div>

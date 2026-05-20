@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\Book;
 use App\Repositories\BookRepository;
-
 class BookController
 {
     private BookRepository $repository;
@@ -12,6 +11,21 @@ class BookController
     public function __construct()
     {
         $this->repository = new BookRepository();
+    }
+
+    public function books() {
+        $limit = $_GET['l'] ?? 10;
+        $offset = $_GET['o'] ?? 0;
+        $books = $this->repository->getAllBooks($limit);
+
+        $_REQUEST['books'] = $books;
+        $_REQUEST['limit'] = $limit;
+        $_REQUEST['offset'] = $offset;
+
+        ob_start();
+        require_once __DIR__ . "/../views/books/books.php";
+        $content = ob_get_clean();
+        require_once __DIR__ . "/../views/layout.php";
     }
 
     public function book() {
