@@ -1,4 +1,4 @@
-name: Continuous Intregration
+name: Continuous Integration
 
 on:
   push:
@@ -9,26 +9,26 @@ on:
       - main
 
 jobs:
-  continuous-intregration:
+  continuous-integration:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-    -name: Setup PHP
-    -uses: shivammathur/setup-php@v2
-    with:
-      php-version: '8.2'
-      extensions: dom, json, libxml, mbstring, pdo, pdo_mysql
-      coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, json, libxml, mbstring, pdo, pdo_mysql
+          coverage: none
 
-    -name: Validate composer
-    -run: composer validate --strict
+      - name: Validate composer
+        run: composer validate --strict
 
-    -name: Install dependencies
-    -run: composer install --prefer-dist -no-progress
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-    -name: Optimize Autoload
-    -run: composer dump-autoload
+      - name: Optimize Autoload
+        run: composer dump-autoload
 
-    -name: Run PHPUnit
-    -run: ./vendor/bin/phpunit
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit
