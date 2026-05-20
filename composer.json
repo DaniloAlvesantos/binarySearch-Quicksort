@@ -1,5 +1,7 @@
 {
   "name": "daniloalvesantos/binarysearch-quicksort",
+  "description": "Sistema de gerenciamento de biblioteca e listagem de livros BinaryLibrary",
+  "license": "proprietary",
   "autoload": {
     "classmap": [
       "app/"
