@@ -153,4 +153,32 @@ class GenreRepository
             return false;
         }
     }
+
+    public function createAll(array $genres)
+    {
+        try {
+            $stmt = $this->conn->prepare(
+                "INSERT INTO tb_genres (
+                name
+            )
+            VALUES (?)"
+            );
+
+            foreach ($genres as $genre) {
+                $stmt->execute([$genre]);
+            }
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $ids = [];
+
+            foreach ($result as $row) {
+                $ids[] = $row["id"];
+            }
+
+            return $ids;
+        } catch (PDOException $e) {
+            die("Error on creating genres: " . $e->getMessage());
+        }
+    }
 }

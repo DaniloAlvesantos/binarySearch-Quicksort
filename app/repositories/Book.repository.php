@@ -27,11 +27,8 @@ class BookRepository
             number_of_pages,
             price,
             publication_year
-         FROM tb_books
-         LIMIT :limit"
+         FROM tb_books"
         );
-
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 
         $stmt->execute();
 

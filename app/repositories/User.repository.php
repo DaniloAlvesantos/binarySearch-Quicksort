@@ -1,7 +1,11 @@
 <?php
 
+namespace App\Repositories;
+
 use App\Models\User;
 use Config\Database;
+use PDO;
+use PDOException;
 
 class UserRepositoy
 {
@@ -43,6 +47,37 @@ class UserRepositoy
         }
     }
 
+    public function login(string $email, string $password): ?User
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT 
+                id,
+                name,
+                email,
+                password
+             FROM tb_users
+             WHERE email = ?"
+        );
+
+        try {
+            $stmt->execute([$email]);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!isset($result["email"])) {
+                return null;
+            }
+
+            if ($result["password"] != $password) {
+                return null;
+            }
+
+            return new User($result["name"], $result["email"], $result["password"]);
+        } catch (PDOException $e) {
+            die("Error on login: " . $e->getMessage());
+        }
+    }
+
     public function getUserById(int $id): ?User
     {
         $stmt = $this->conn->prepare(
@@ -64,7 +99,6 @@ class UserRepositoy
             }
 
             return new User(
-                $result["id"],
                 $result["name"],
                 $result["email"],
                 $result["password"]
@@ -76,23 +110,41 @@ class UserRepositoy
 
     public function createUser(User $u): bool
     {
-        $stmt = $this->conn->prepare(
-            "INSERT INTO tb_users (
+        $error = "";
+        try {
+            $stmt = $this->conn->prepare(
+                "SELECT name, email, password FROM tb_users
+            WHERE email = ?"
+            );
+
+            
+            $error = "Error on checking user's existence.";
+            $stmt->execute([$u->getEmail()]);
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (isset($result['email'])) {
+                return false;
+            }
+
+            $error = "Error on creating user: ";
+
+            $stmt = $this->conn->prepare(
+                "INSERT INTO tb_users (
                 name,
                 email,
                 password
             )
             VALUES (?, ?, ?)"
-        );
+            );
 
-        try {
             return $stmt->execute([
                 $u->getName(),
                 $u->getEmail(),
                 $u->getPassword()
             ]);
         } catch (PDOException $e) {
-            die("Error on creating user: " . $e->getMessage());
+            die($error . $e->getMessage());
         }
     }
 

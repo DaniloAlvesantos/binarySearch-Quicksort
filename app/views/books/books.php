@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Book;
+use PHPUnit\Runner\Baseline\Baseline;
 
 /** @var Book[] $books */
 $books = $_REQUEST['books'];
@@ -8,7 +9,7 @@ $books = $_REQUEST['books'];
 ?>
 
 <section class="container-fluid">
-
+    <a href="<?= BASE_URL ?>/index.php?action=create:book">Cadastrar Livro</a>
     <div class="row">
         <?php foreach ($books as $book): ?>
             <div class="card col-md-3 p-2 m-3">

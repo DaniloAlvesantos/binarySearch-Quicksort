@@ -8,7 +8,7 @@ $signedIn = (isset($_SESSION['user']) && $_SESSION['user']) ? true : false;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $title ?? "BinaryLibrary" ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="<?= BASE_URL ?>/public/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -34,11 +34,13 @@ $signedIn = (isset($_SESSION['user']) && $_SESSION['user']) ? true : false;
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><?= $signedIn ? "Perfil" : "Login"; ?></a>
+                        <a class="nav-link" href="<?= BASE_URL ?>/index.php?action=<?= $signedIn ? "logout" : "login" ?>"><?= $signedIn ? "Perfil" : "Login"; ?></a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search" action="/" method="GET">
-                    <input class="form-control me-2" type="search" name="search" placeholder="Pesquisar" aria-label="Search" value="<?= htmlspecialchars($_GET['search'] ?? "") ?>" />
+                <form class="d-flex" role="search" action="<?= BASE_URL ?>/index.php" method="GET">
+                    <input type="hidden" name="action" value="search">
+
+                    <input class="form-control me-2" type="search" name="q" placeholder="Pesquisar" aria-label="Search" value="<?= htmlspecialchars($_GET['q'] ?? "") ?>" />
                     <button class="btn btn-outline-primary" type="submit">Buscar</button>
                 </form>
             </div>
@@ -49,7 +51,15 @@ $signedIn = (isset($_SESSION['user']) && $_SESSION['user']) ? true : false;
         <?= $content ?? "<h1>Página não encontrada</h1>"; ?>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="<?= BASE_URL ?>/public/js/bootstrap.bundle.min.js"></script>
+    <?php
+    if (!isset($scripts)) {
+        return;
+    }
+
+    foreach ($scripts as $script): ?>
+        <script src="<?= BASE_URL ?>/public/js/<?= $script ?>"></script>
+    <?php endforeach; ?>
 </body>
 
 </html>

@@ -26,19 +26,20 @@ class BinarySearch
         return -1;
     }
 
-    public static function byNumber(array $arr, int $target) {
+    public static function byNumber(array $arr, int $target)
+    {
         $left = 0;
         $right = count($arr) - 1;
 
-        while($left <= $right) {
-            $mid = intval(floor(($left+$right) / 2));
+        while ($left <= $right) {
+            $mid = intval(floor(($left + $right) / 2));
 
-            if($mid === $target) {
+            if ($arr[$mid] === $target) {
                 return $mid;
-            } else if($mid < $target) {
+            } else if ($arr[$mid] < $target) {
                 $left = $mid + 1;
             } else {
-                $left = $mid - 1;
+                $right = $mid - 1;
             }
         }
 

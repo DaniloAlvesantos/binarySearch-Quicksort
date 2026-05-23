@@ -134,4 +134,32 @@ class AuthorRepository
             return false;
         }
     }
+
+    public function createAll(array $authors)
+    {
+        try {
+            $stmt = $this->conn->prepare(
+                "INSERT INTO tb_authors (
+                name
+            )
+            VALUES (?)"
+            );
+
+            foreach ($authors as $author) {
+                $stmt->execute([$author]);
+            }
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $ids = [];
+
+            foreach ($result as $row) {
+                $ids[] = $row["id"];
+            }
+
+            return $ids;
+        } catch (PDOException $e) {
+            die("Error on creating authors: " . $e->getMessage());
+        }
+    }
 }
