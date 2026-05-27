@@ -16,6 +16,7 @@ $routes = [
     'authors' => ['class' => App\Controllers\AuthorController::class, 'method' => 'authors'],
     'login'   => ['class' => App\Controllers\UserController::class, 'method' => 'login'],
     'create:user' => ['class' => App\Controllers\UserController::class, 'method' => 'create'],
+    'author' => ['class' => App\Controllers\AuthorController::class, 'method' => 'author'],
 ];
 
 $action = $_GET['action'] ?? 'cards';

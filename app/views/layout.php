@@ -29,7 +29,7 @@ $signedIn = (isset($_SESSION['user']) && $_SESSION['user']) ? true : false;
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?= BASE_URL ?>/index.php?action=books">Ver todos</a></li>
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/authors">Autores</a></li>
+                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/index.php?action=authors">Autores</a></li>
                             <li><a class="dropdown-item" href="<?= BASE_URL ?>/genres">Gêneros</a></li>
                         </ul>
                     </li>

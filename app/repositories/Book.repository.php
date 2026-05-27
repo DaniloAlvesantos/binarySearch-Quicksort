@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTOS\BookGenre;
 use App\Models\Book;
 use Config\Database;
 use PDO;
@@ -54,23 +55,59 @@ class BookRepository
         return $books;
     }
 
-    public function getBookBySlug(string $slug): ?Book
+    public function getBookBySlug(string $slug): ?BookGenre
     {
         if (empty($slug)) {
             return null;
         }
 
         $stmt = $this->conn->prepare(
-            "SELECT 
-                id,
-                name,
-                description,
-                slug,
-                number_of_pages,
-                price,
-                publication_year
-             FROM tb_books
-             WHERE slug = ?"
+            "WITH RECURSIVE genre_tree AS (
+                -- root genres
+                SELECT
+                    id,
+                    name,
+                    parent_id,
+                    name AS full_path
+                FROM tb_genres
+                WHERE parent_id IS NULL
+
+                UNION ALL
+
+                -- child genres
+                SELECT
+                    g.id,
+                    g.name,
+                    g.parent_id,
+                    CONCAT(gt.full_path, ' > ', g.name) AS full_path
+                FROM tb_genres g
+                JOIN genre_tree gt
+                    ON g.parent_id = gt.id
+            )
+
+            SELECT
+                b.id,
+                b.name,
+                b.description,
+                b.slug,
+                b.number_of_pages,
+                b.price,
+                b.publication_year,
+                GROUP_CONCAT(gt.full_path SEPARATOR ', ') AS genres
+            FROM tb_books b
+            JOIN tb_books_genres bg
+                ON bg.book_id = b.id
+            JOIN genre_tree gt
+                ON gt.id = bg.genre_id
+            WHERE b.slug = ?
+            GROUP BY
+                b.id,
+                b.name,
+                b.description,
+                b.slug,
+                b.number_of_pages,
+                b.price,
+                b.publication_year;"
         );
 
         $stmt->execute([$slug]);
@@ -81,7 +118,7 @@ class BookRepository
             return null;
         }
 
-        return new Book(
+        $book = new Book(
             $result["name"],
             $result["description"],
             $result["slug"],
@@ -89,6 +126,8 @@ class BookRepository
             $result["price"],
             $result["publication_year"]
         );
+
+        return new BookGenre($book, $result["genres"]);
     }
 
     public function createBook(Book $b, array $authors, array $genres): bool

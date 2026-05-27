@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Book;
+use App\DTOS\BookGenre;
 
-/** @var Book $book */
+/** @var BookGenre $book */
 $book = $_REQUEST['book'];
 
 if (!isset($book)) {
@@ -14,11 +14,29 @@ if (!isset($book)) {
 ?>
 
 <section class="container-fluid">
-    <h2><?= $book->getName(); ?></h2>
-    <p><?= $book->getDescription(); ?></p>
+    <h2><?= $book->book->getName(); ?></h2>
+
+    <p><?= $book->book->getDescription(); ?></p>
+
     <ul>
-        <li>Número de páginas: <?= $book->getNumberOfPages(); ?></li>
-        <li>Preço: <?= $book->getFormatedPrice(); ?></li>
-        <li>Ano de publicação: <?= $book->getPubYear(); ?></li>
+        <li>
+            Número de páginas:
+            <?= $book->book->getNumberOfPages(); ?>
+        </li>
+
+        <li>
+            Preço:
+            <?= $book->book->getFormatedPrice(); ?>
+        </li>
+
+        <li>
+            Ano de publicação:
+            <?= $book->book->getPubYear(); ?>
+        </li>
+
+        <li>
+            Gêneros:
+            <?= $book->genres; ?>
+        </li>
     </ul>
 </section>

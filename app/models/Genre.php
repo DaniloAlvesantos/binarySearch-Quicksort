@@ -4,14 +4,14 @@ namespace App\Models;
 
 class Genre
 {
-    private ?int $id;
+    private ?int $id = null;
     private string $name;
-    private int $parentId;
+    private ?int $parentId;
 
-    public function __construct(string $name, int $parentId)
+    public function __construct(string $name, ?int $parentId)
     {
         $this->setName($name);
-        $this->setParentId($parentId);
+        if($parentId) $this->setParentId($parentId);
     }
 
     public function getId(): int
@@ -45,7 +45,7 @@ class Genre
 
     public function setParentId(int $parentId): void
     {
-        if ($parentId <= 0) return;
+        if ($parentId <= 0 || $parentId === null) return;
 
         $this->parentId = $parentId;
     }

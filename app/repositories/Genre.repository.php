@@ -20,10 +20,31 @@ class GenreRepository
     public function getAllGenres(): array
     {
         $stmt = $this->conn->query(
-            "SELECT 
-                id,
-                name
-             FROM tb_genres"
+            "WITH RECURSIVE genre_tree AS (
+                -- root genres
+                SELECT
+                    id,
+                    name,
+                    parent_id,
+                    name AS full_path
+                FROM tb_genres
+                WHERE parent_id IS NULL
+
+                UNION ALL
+
+                -- children
+                SELECT
+                    g.id,
+                    g.name,
+                    g.parent_id,
+                    CONCAT(gt.full_path, ' > ', g.name)
+                FROM tb_genres g
+                INNER JOIN genre_tree gt
+                    ON g.parent_id = gt.id
+            )
+
+            SELECT *
+            FROM genre_tree;"
         );
 
         $genres = [];

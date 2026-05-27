@@ -4,7 +4,7 @@ namespace App\Models;
 
 class Author
 {
-    private ?int $id;
+    private ?int $id = null;
     private string $name;
 
     public function __construct(string $name)

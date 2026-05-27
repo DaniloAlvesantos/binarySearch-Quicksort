@@ -7,7 +7,7 @@ use App\Models\Book;
 
 class BookTest extends TestCase
 {
-    public Book $book;
+    protected Book $book;
 
     protected function setUp(): void
     {
@@ -43,5 +43,15 @@ class BookTest extends TestCase
 
         $this->assertIsString($this->book->getFormatedPrice());
         $this->assertEquals($this->book->getFormatedPrice(), "R$80,00");
+    }
+
+    public function testNotchangeId()
+    {
+        $book = $this->book;
+
+        $book->setId(10);
+        $this->assertNotNull($book->getId());
+        // The book shouldn't change the id
+        $this->assertEquals(1, $book->getId());
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Repositories;
 
+use App\DTOS\AuthorBooks;
 use App\Models\Author;
+use App\Models\Book;
 use Config\Database;
+use Exception;
 use PDO;
 use PDOException;
 
@@ -32,9 +35,10 @@ class AuthorRepository
             $authors = [];
 
             foreach ($result as $row) {
-                $authors[] = new Author(
-                    $row["name"]
-                );
+                $author = new Author($row['name']);
+                $author->setId($row['id']);
+
+                $authors[] = $author;
             }
 
             return $authors;
@@ -160,6 +164,40 @@ class AuthorRepository
             return $ids;
         } catch (PDOException $e) {
             die("Error on creating authors: " . $e->getMessage());
+        }
+    }
+
+    public function getAuthorBooks(int $id)
+    {
+        try {
+            $stmt = $this->conn->prepare(
+                "SELECT a.name, b.name as bookName, b.slug FROM tb_books_authors ba
+                INNER JOIN tb_authors a
+                ON a.id = ba.author_id
+                INNER JOIN tb_books b
+                ON b.id = ba.book_id
+                WHERE a.id = ?;"
+            );
+            
+            $stmt->execute([$id]);
+
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $books = [];
+
+            foreach ($result as $authorBooks) {
+                $books[] = new Book(
+                    $authorBooks['bookName'],
+                    "",
+                    $authorBooks['slug'],
+                    0,
+                    0.0,
+                    0
+                );
+            }
+
+            return new AuthorBooks($result[0]['name'], $books);
+        } catch (Exception $e) {
+            die("Error on getting author's book" . $e->getMessage());
         }
     }
 }
