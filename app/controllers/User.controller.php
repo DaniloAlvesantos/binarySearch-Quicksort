@@ -14,7 +14,6 @@ class UserController
         $this->repository = new UserRepositoy();
     }
 
-
     public function login()
     {
         $message = "";
@@ -40,7 +39,6 @@ class UserController
         ob_start();
         require_once __DIR__ . "/../views/login/login.php";
         $content = ob_get_clean();
-        
         require_once __DIR__ . "/../views/layout.php";
     }
 
