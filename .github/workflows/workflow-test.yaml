@@ -11,6 +11,17 @@ on:
 jobs:
   continuous-integration:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: binary_library
+        ports:
+          - 3306:3306
+        options: --entrypoint sh mysql:8.0 -c "exec docker-entrypoint.sh mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,6 +31,11 @@ jobs:
           php-version: '8.2'
           extensions: dom, json, libxml, mbstring, pdo, pdo_mysql
           coverage: none
+
+      - name: Verify MySQL Connection
+        run: |
+          sudo apt-get install -y mysql-client
+          mysqladmin ping -h 127.0.0.1 -u root -proot --silent
 
       - name: Validate composer
         run: composer validate --strict
@@ -32,3 +48,8 @@ jobs:
 
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASS: root
+          DB_NAME: binary_library
