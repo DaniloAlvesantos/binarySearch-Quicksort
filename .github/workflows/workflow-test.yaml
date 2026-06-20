@@ -12,7 +12,6 @@ jobs:
   continuous-integration:
     runs-on: ubuntu-latest
 
-    # Configuração correta de serviços nativos para o GitHub Actions
     services:
       mysql:
         image: mysql:8.0
@@ -21,7 +20,6 @@ jobs:
           MYSQL_DATABASE: binary_library
         ports:
           - 3306:3306
-        # Garante a checagem de integridade (Healthcheck) para o Runner esperar o MySQL estar pronto
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -32,13 +30,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- ETAPA 1: CONFIGURAÇÃO E TESTES PHP ---
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: dom, json, libxml, mbstring, pdo, pdo_mysql, sqlite3, pdo_sqlite
-          coverage: xdebug # Ativa o Xdebug para permitir a extração de Code Coverage pelo PHPUnit
+          coverage: xdebug
 
       - name: Validate composer
         run: composer validate --strict
@@ -54,25 +51,22 @@ jobs:
           mkdir -p output/coverage
           ./vendor/bin/phpunit --coverage-html output/coverage
         env:
-          DB_HOST: 127.0.0.1
+          DB_HOST: mysql
           DB_USER: root
           DB_PASS: root
           DB_NAME: binary_library
 
-      # --- ETAPA 2: EXECUÇÃO DOS ALGORITMOS (PYTHON/DOCKER) ---
       - name: Run Algorithm Metrics & Graphs via Docker
         run: |
-          # Executa o contêiner de métricas do Quicksort e Busca Binária
           docker compose up --build --exit-code-from algoritmo-metrics
 
-      # --- ETAPA 3: COLETA AUTOMÁTICA DE ARTEFATOS DO WORKFLOW ---
       - name: Fix Permissions for Upload
         if: always()
         run: sudo chown -R $USER:$USER output/
 
       - name: Upload Execution Metrics and Graphs (Artifact)
         uses: actions/upload-artifact@v4
-        if: always() # Salva os gráficos gerados mesmo se houver falha nos testes unitários
+        if: always()
         with:
           name: execution-metrics-and-graphs
           path: |
@@ -83,9 +77,7 @@ jobs:
 
       - name: Upload PHPUnit Code Coverage (Artifact)
         uses: actions/upload-artifact@v4
-        # Modificado para 'always()' temporariamente para você conseguir inspecionar os erros caso falhe, 
-        # mas o ideal é 'success()' quando os testes estiverem 100% passando
-        if: always() 
+        if: always()
         with:
           name: phpunit-code-coverage-report
           path: output/coverage/

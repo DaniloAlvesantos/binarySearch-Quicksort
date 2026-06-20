@@ -12,13 +12,13 @@ class Database
 
     private function __construct()
     {
-        $host = "localhost";
-        $dbname = "library";
-        $username = "root";
-        $password = "";
+        $host     = getenv('DB_HOST')     ?: "localhost";
+        $dbname   = getenv('DB_NAME')     ?: "library";
+        $username = getenv('DB_USER')     ?: "root";
+        $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : "";
 
         try {
-            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die("Error connecting to the database: " . $e->getMessage());
