@@ -1,97 +1,52 @@
 import time
-import psutil
-import os
+from quicksort import quicksort as intSort  
+import quicksort
+from binarySearch import binarySearch as byNumber  
+import binarySearch
 
-def benchmark_binarySearch(arr, x):
-    low = 0
-    high = len(arr) - 1
-    iterations = 0
-    target = None
+def benchmark_quicksort(arr_to_sort):
+    list_copy = arr_to_sort.copy()
 
-    while low <= high:
-        iterations += 1
-        mid = low + (high - low) // 2
+    quicksort.quicksort_iterations = 0
 
-        if arr[mid] == x:
-            target = mid
-            break
-        elif arr[mid] < x:
-            low = mid + 1
-        else:
-            high = mid - 1
+    start_time = time.perf_counter()
+    intSort(list_copy, 0, len(list_copy) - 1)
+    end_time = time.perf_counter()
     
-    if(target == None):
-        return -1
+    execution_time = end_time - start_time
+
+    total_iterations = quicksort.quicksort_iterations
+
+    return list_copy, execution_time, total_iterations
+
+def benchmark_binary_search(arr, target):
+    binarySearch.quicksort_iterations = 0
+
+    start_time = time.perf_counter()
+    index_found = byNumber(arr, target)
+    end_time = time.perf_counter()
+
+    execution_time = end_time - start_time
+
+    total_iterations = binarySearch.binarysearch_iterations
+
+    return index_found, execution_time, total_iterations
+
+def exec_metrics_quicksort(arr_to_sort):
+    print("\n--- Executando Métricas: Quicksort ---")
+    result, duration, iterations = benchmark_quicksort(arr_to_sort)
+    print(f"Tamanho do Array processado: {len(result)} elementos")
+    print(f"Iterações executadas: {iterations}")
+    print(f"Tempo de execução: {duration:.8f} segundos")
+    return {"sorted_arr": result, "time": duration, "iterations": iterations}
+
+def exec_metrics_binarySearch(sorted_arr, target):
+    print(f"\n--- Executando Métricas: Busca Binária (Alvo: {target}) ---")
+    index, duration, iterations = benchmark_binary_search(sorted_arr, target)
+    if index != -1:
+        print(f"Elemento localizado com sucesso no índice: {index}")
     else:
-        return target, iterations
-
-def benchmark_quicksort(arr):
-    iterations = 0
-    def quicksort(arr, left, right):
-        nonlocal iterations
-        if left < right:
-            iterations += 1
-            pivot = partition(arr, left, right)
-
-            quicksort(arr, left, pivot-1)
-            quicksort(arr, pivot+1, right)
-
-        return arr, iterations
-
-    def partition(arr, left, right):
-        pivot = arr[right]
-        i = left - 1
-
-        for j in range(left, right):
-            if arr[j] <= pivot:
-                i += 1
-                arr[i], arr[j] = arr[j], arr[i]
-        
-        arr[i+1], arr[right] = arr[right], arr[i+1]
-        
-        return i + 1
-
-def exec_metrics_quicksort(list):
-    process = psutil.Process(os.getpid())
-    prev_memory = process.memory_info().rss / 1024 / 1024
-
-    start_time = time.perf_counter()
-
-    result, iterations = benchmark_quicksort(list)
-
-    end_time = time.perf_counter()
-    elapsed_time = round((end_time - start_time) * 1000, 6)
-
-    current_memory = process.memory_info().rss / 1024 / 1024 
-    memory_usage = round(current_memory - prev_memory, 6)
-
-    return {
-        'input': list,
-        'result': result,
-        'time_ms': elapsed_time,
-        'memory_mb': memory_usage,
-        'iterations': iterations
-    }
-
-def exec_metrics_binarySearch(list, n):
-    process = psutil.Process(os.getpid())
-    prev_memory = process.memory_info().rss / 1024 / 1024
-
-    start_time = time.perf_counter()
-
-    result, iterations = benchmark_binarySearch(list, n)
-
-    end_time = time.perf_counter()
-    elapsed_time = round((end_time - start_time) * 1000, 6)
-
-    current_memory = process.memory_info().rss / 1024 / 1024 
-    memory_usage = round(current_memory - prev_memory, 6)
-
-    return {
-        'input': list,
-        'target': n,
-        'result': result,
-        'time_ms': elapsed_time,
-        'memory_mb': memory_usage,
-        'iterations': iterations
-    }
+        print("Elemento não foi encontrado no array.")
+    print(f"Iterações executadas: {iterations}")
+    print(f"Tempo de busca: {duration:.8f} segundos")
+    return {"index": index, "time": duration, "iterations": iterations}

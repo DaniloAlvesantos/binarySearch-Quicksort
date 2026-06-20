@@ -1,53 +1,59 @@
 import random
 import json
+import os
+import sys
 import pandas as pd
 
-from algorithms.metrics import exec_metrics_quicksort, exec_metrics_binarySearch
-from algorithms.graph import gerar_graficos
+sys.setrecursionlimit(2000000)
 
-results = []
-random_nums = [random.randint(1, 100) for _ in range(100)]
+from metrics import exec_metrics_quicksort, exec_metrics_binarySearch
 
-print("\nRandom Numbers:")
-print(random_nums)
+try:
+    from graph import gerar_graficos
+except ImportError:
+    def gerar_graficos(df): pass
 
-sorted_random_nums = []
+os.makedirs("output", exist_ok=True)
 
-quicksort_result = exec_metrics_quicksort(random_nums)
-results.append(quicksort_result)
-sorted_random_nums = quicksort_result["result"]
+num_range = 1000000
+random_nums = [random.randint(1, num_range) for _ in range(num_range)]
 
-print("\nSorted Random Numbers:")
-print(sorted_random_nums)
 
-target = random_nums[random.randint(0, len(sorted_random_nums) - 1)]
-binarySearch_result = exec_metrics_binarySearch(sorted_random_nums, target)
-results.append(binarySearch_result)
+quicksort_data = exec_metrics_quicksort(random_nums)
+sorted_random_nums = quicksort_data["sorted_arr"]
 
-df = pd.DataFrame(results)
+target = random_nums[random.randint(0, len(random_nums) - 1)]
+binary_data = exec_metrics_binarySearch(sorted_random_nums, target)
 
-df.to_csv("/algorithms/output.metrics.csv", index=False)
+results_data = [
+    {
+        'algorithm': 'Quicksort',
+        'time_s': quicksort_data["time"],
+        'iterations': quicksort_data["iterations"]
+    },
+    {
+        'algorithm': 'Busca Binaria',
+        'time_s': binary_data["time"],
+        'iterations': binary_data["iterations"]
+    }
+]
+
+df = pd.DataFrame(results_data)
+df.to_csv("output/metrics.csv", index=False)
 
 summary = {
-    'input': random_nums,
     'input_size': len(random_nums),
-    'sorted_input': sorted_random_nums,
-    'target': target,
-    'target_result': binarySearch_result['result'],
-    'avd_time': round(df['time_ms'].mean(), 4),
-    'avd_memory': round(df['memory_mb'].mean(), 4),
-    'avd_iterations': round(df['iterations'].mean(), 4)
+    'target': int(target),
+    'target_result_index': int(binary_data["index"]),
+    'quicksort_time_s': round(quicksort_data["time"], 6),
+    'binary_search_time_s': round(binary_data["time"], 6),
+    'avg_time_s': round(df['time_s'].mean(), 6)
 }
 
-with open("/algorithms/output.summary.json", "w") as file:
-    json.dump(
-        summary,
-        file,
-        indent=4,
-        ensure_ascii=False
-    )
+with open("output/metrics.json", "w") as file:
+    json.dump(summary, file, indent=4, ensure_ascii=False)
 
-print("\nResults:")
+print("\nResultados Consolidados:")
 print(df)
 
 gerar_graficos(df)
@@ -55,7 +61,9 @@ gerar_graficos(df)
 print("\nGenerated Files in /output")
 print("- metrics.csv")
 print("- metrics.json")
-print("- performance_graph.png")
-print("- iterations_graph.png")
+print("- performance_graph_normal.png (Busca binária invisível)")
+print("- performance_graph_log.png    (Visualização perfeita)")
+print("- iterations_graph_normal.png  (Busca binária invisível)")
+print("- iterations_graph_log.png     (Visualização perfeita)")
 
 print("\nExecução concluída.")
