@@ -1,10 +1,6 @@
 services:
-
   algoritmo-metrics:
-
     build: .
-
     container_name: fatec-algorithm-metrics
-
     volumes:
-      - ./output:/algorithms/output
+      - ./output:/app/output

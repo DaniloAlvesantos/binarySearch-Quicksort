@@ -1,11 +1,13 @@
-FROM python
+FROM python:3.11-slim
 
-WORKDIR /algorithms
+WORKDIR /app
 
-COPY algorithms/ .
+COPY algorithms/requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN mkdir -p /algorithms/output
+COPY algorithms/ .
+
+RUN mkdir -p /app/output
 
 CMD ["python", "main.py"]
