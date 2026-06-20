@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Continuous Integration and Artifacts
 
 on:
   push:
@@ -12,6 +12,7 @@ jobs:
   continuous-integration:
     runs-on: ubuntu-latest
 
+    # Configura o serviço do MySQL necessário para os testes de repositório do PHP
     services:
       mysql:
         image: mysql:8.0
@@ -23,19 +24,16 @@ jobs:
         options: --entrypoint sh mysql:8.0 -c "exec docker-entrypoint.sh mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      # --- ETAPA 1: CONFIGURAÇÃO E TESTES PHP ---
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: dom, json, libxml, mbstring, pdo, pdo_mysql
-          coverage: none
-
-      - name: Verify MySQL Connection
-        run: |
-          sudo apt-get install -y mysql-client
-          mysqladmin ping -h 127.0.0.1 -u root -proot --silent
+          extensions: dom, json, libxml, mbstring, pdo, pdo_mysql, sqlite3, pdo_sqlite
+          coverage: xdebug # Ativa o Xdebug para permitir o relatório de cobertura
 
       - name: Validate composer
         run: composer validate --strict
@@ -46,10 +44,42 @@ jobs:
       - name: Optimize Autoload
         run: composer dump-autoload
 
-      - name: Run PHPUnit
-        run: ./vendor/bin/phpunit
+      - name: Run PHPUnit & Generate Coverage Report
+        run: |
+          mkdir -p output/coverage
+          ./vendor/bin/phpunit --coverage-html output/coverage
         env:
           DB_HOST: 127.0.0.1
           DB_USER: root
           DB_PASS: root
           DB_NAME: binary_library
+
+      # --- ETAPA 2: EXECUÇÃO DOS ALGORITMOS (PYTHON/DOCKER) ---
+      - name: Run Algorithm Metrics & Graphs via Docker
+        run: |
+          # Executa o container de métricas do Quicksort e Busca Binária
+          docker compose up --build --exit-code-from algoritmo-metrics
+
+      # --- ETAPA 3: COLETA AUTOMÁTICA DE ARTEFATOS DO WORKFLOW ---
+      - name: Fix Permissions for Upload
+        if: always()
+        run: sudo chown -R $USER:$USER output/
+
+      - name: Upload Execution Metrics and Graphs (Artifact)
+        uses: actions/upload-artifact@v4
+        if: always() # Salva os gráficos mesmo se houver alguma quebra nos testes
+        with:
+          name: execution-metrics-and-graphs
+          path: |
+            output/metrics.csv
+            output/metrics.json
+            output/*_graph_*.png
+          retention-days: 14
+
+      - name: Upload PHPUnit Code Coverage (Artifact)
+        uses: actions/upload-artifact@v4
+        if: success() # Só gera o relatório de cobertura de código se os testes passarem
+        with:
+          name: phpunit-code-coverage-report
+          path: output/coverage/
+          retention-days: 14
