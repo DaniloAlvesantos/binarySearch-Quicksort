@@ -1,8 +1,8 @@
 {
     "input_size": 1000000,
-    "target": 567855,
-    "target_result_index": 568657,
-    "quicksort_time_s": 6.826712,
-    "binary_search_time_s": 2e-05,
-    "avg_time_s": 3.413366
+    "target": 993954,
+    "target_result_index": 994005,
+    "quicksort_time_s": 3.15872,
+    "binary_search_time_s": 9e-06,
+    "avg_time_s": 1.579364
 }

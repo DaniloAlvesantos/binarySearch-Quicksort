@@ -29,12 +29,16 @@ results_data = [
     {
         'algorithm': 'Quicksort',
         'time_s': quicksort_data["time"],
-        'iterations': quicksort_data["iterations"]
+        'iterations': quicksort_data["iterations"],
+        'memory_mb': quicksort_data["memory"],
+        'cpu_percent': quicksort_data["cpu"]
     },
     {
         'algorithm': 'Busca Binaria',
         'time_s': binary_data["time"],
-        'iterations': binary_data["iterations"]
+        'iterations': binary_data["iterations"],
+        'memory_mb': binary_data["memory"],
+        'cpu_percent': binary_data["cpu"]
     }
 ]
 
